@@ -35,7 +35,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nested Screens'),
+        title: Text('Main Screen'),
       ),
       body: Center(
         child: ListView.builder(
@@ -44,7 +44,11 @@ class _MainScreenState extends State<MainScreen> {
             return ListTile(
               title: Text(screens[index]),
               onTap: () {
-                Navigator.pushNamed(context, '/nested');
+                Navigator.pushNamed(
+                  context,
+                  '/nested',
+                  arguments: {'name': screens[index]},
+                );
               },
             );
           },
@@ -103,9 +107,13 @@ class _NestedScreenState extends State<NestedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final String currentScreenName = args['name'];
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Nested Screens'),
+        title: Text(currentScreenName),
       ),
       body: Center(
         child: ListView.builder(
@@ -114,7 +122,11 @@ class _NestedScreenState extends State<NestedScreen> {
             return ListTile(
               title: Text(nestedScreens[index]),
               onTap: () {
-                Navigator.pushNamed(context, '/nested');
+                Navigator.pushNamed(
+                  context,
+                  '/nested',
+                  arguments: {'name': nestedScreens[index]},
+                );
               },
             );
           },
