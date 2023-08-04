@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sms_autofill/sms_autofill.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,11 +25,29 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   List<String> screens = [];
+  String appcode = "";
+  late String appSign;
 
   void _addScreen(String name) {
     setState(() {
       screens.add(name);
     });
+  }
+
+  void getAppSign() async {
+    appSign = await SmsAutoFill().getAppSignature;
+    print(appSign);
+  }
+
+  void listenForCode() async {
+    await SmsAutoFill().listenForCode();
+  }
+
+  @override
+  void initState() {
+    getAppSign();
+    listenForCode();
+    super.initState();
   }
 
   @override
@@ -38,20 +57,49 @@ class _MainScreenState extends State<MainScreen> {
         title: Text('Main Screen'),
       ),
       body: Center(
-        child: ListView.builder(
-          itemCount: screens.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(screens[index]),
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  '/nested',
-                  arguments: {'name': screens[index]},
-                );
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () async {
+                await SmsAutoFill().listenForCode();
               },
-            );
-          },
+              child: Text('send otp'),
+            ),
+            PinFieldAutoFill(
+              decoration: BoxLooseDecoration(
+                strokeColorBuilder:
+                    PinListenColorBuilder(Colors.black, Colors.black26),
+                bgColorBuilder: const FixedColorBuilder(Colors.white),
+                strokeWidth: 2,
+              ),
+              autoFocus: true,
+              cursor: Cursor(color: Colors.red, enabled: true, width: 1),
+              currentCode: appcode,
+              onCodeSubmitted: (code) {},
+              codeLength: 6,
+              onCodeChanged: (code) {
+                print(code);
+                setState(() {
+                  appcode = code ?? "";
+                });
+              },
+            ),
+            // ListView.builder(
+            //   itemCount: screens.length,
+            //   itemBuilder: (context, index) {
+            //     return ListTile(
+            //       title: Text(screens[index]),
+            //       onTap: () {
+            //         Navigator.pushNamed(
+            //           context,
+            //           '/nested',
+            //           arguments: {'name': screens[index]},
+            //         );
+            //       },
+            //     );
+            //   },
+            // ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
